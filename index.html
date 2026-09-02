@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gladiator League — Football Tournament</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <i class="fas fa-shield-halved"></i>
+        <span>Gladiator<span class="gold">League</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#fixtures">Fixtures</a></li>
+        <li><a href="#standings">Standings</a></li>
+        <li><a href="#teams">Teams</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero" id="home">
+    <div class="hero-overlay"></div>
+    <div class="hero-particles" id="particles"></div>
+    <div class="hero-content">
+      <p class="hero-subtitle">⚽ Season 2026 — Registration Open</p>
+      <h1 class="hero-title">
+        GLADIATOR<br /><span class="gold">LEAGUE</span>
+      </h1>
+      <p class="hero-desc">Where legends clash and champions rise. The ultimate football tournament awaits.</p>
+      <div class="hero-cta">
+        <a href="#contact" class="btn btn-primary">Register Now</a>
+        <a href="#fixtures" class="btn btn-outline">View Fixtures</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number" data-target="16">0</span>
+          <span class="stat-label">Teams</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-target="64">0</span>
+          <span class="stat-label">Matches</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-target="5000">0</span>
+          <span class="stat-label">Prize Pool ($)</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-target="30">0</span>
+          <span class="stat-label">Match Days</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT ===================== -->
+  <section class="section" id="about">
+    <div class="container">
+      <h2 class="section-title">About the <span class="gold">Tournament</span></h2>
+      <p class="section-subtitle">Everything you need to know about the Gladiator League</p>
+      <div class="about-grid">
+        <div class="about-card">
+          <div class="about-icon"><i class="fas fa-trophy"></i></div>
+          <h3>The Format</h3>
+          <p>16 teams battle through a round-robin group stage followed by single-elimination knockouts. Every match counts. No room for complacency.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-icon"><i class="fas fa-calendar-days"></i></div>
+          <h3>Schedule</h3>
+          <p>The tournament runs from October 1 — November 15, 2026. Group stages span 4 weeks, followed by 2 weeks of electrifying knockout rounds.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-icon"><i class="fas fa-location-dot"></i></div>
+          <h3>Venue</h3>
+          <p>All matches are held at the Gladiator Arena — a state-of-the-art turf ground with floodlights, spectator stands, and live commentary.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-icon"><i class="fas fa-medal"></i></div>
+          <h3>Prizes</h3>
+          <p>$5,000 total prize pool. Champions take home the Gladiator Shield trophy, individual awards for Golden Boot, Golden Glove, and MVP.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-icon"><i class="fas fa-clipboard-list"></i></div>
+          <h3>Rules</h3>
+          <p>Standard 11-a-side rules. 45-minute halves in groups, extra time and penalties in knockouts. Fair play points break ties.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-icon"><i class="fas fa-user-shield"></i></div>
+          <h3>Eligibility</h3>
+          <p>Open to amateur and semi-pro teams. Each squad registers 18–23 players. Age 16+ with valid ID required for all participants.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FIXTURES ===================== -->
+  <section class="section section-dark" id="fixtures">
+    <div class="container">
+      <h2 class="section-title">Upcoming <span class="gold">Fixtures</span></h2>
+      <p class="section-subtitle">Key matches from the group stage</p>
+
+      <div class="fixture-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="group-a">Group A</button>
+        <button class="filter-btn" data-filter="group-b">Group B</button>
+        <button class="filter-btn" data-filter="group-c">Group C</button>
+        <button class="filter-btn" data-filter="group-d">Group D</button>
+      </div>
+
+      <div class="fixtures-grid" id="fixturesGrid">
+        <!-- Dynamic fixtures rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STANDINGS ===================== -->
+  <section class="section" id="standings">
+    <div class="container">
+      <h2 class="section-title">League <span class="gold">Standings</span></h2>
+      <p class="section-subtitle">Group A table — updated after each matchday</p>
+
+      <div class="standings-tabs">
+        <button class="standings-tab active" data-tab="A">Group A</button>
+        <button class="standings-tab" data-tab="B">Group B</button>
+        <button class="standings-tab" data-tab="C">Group C</button>
+        <button class="standings-tab" data-tab="D">Group D</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="standings-table" id="standingsTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Team</th>
+              <th>P</th>
+              <th>W</th>
+              <th>D</th>
+              <th>L</th>
+              <th>GF</th>
+              <th>GA</th>
+              <th>GD</th>
+              <th>Pts</th>
+            </tr>
+          </thead>
+          <tbody id="standingsBody">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note"><span class="qual-dot"></span> Top 2 qualify for knockout stage</p>
+    </div>
+  </section>
+
+  <!-- ===================== TEAMS ===================== -->
+  <section class="section section-dark" id="teams">
+    <div class="container">
+      <h2 class="section-title">Competing <span class="gold">Teams</span></h2>
+      <p class="section-subtitle">16 squads ready for glory</p>
+      <div class="teams-grid" id="teamsGrid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== GALLERY ===================== -->
+  <section class="section" id="gallery">
+    <div class="container">
+      <h2 class="section-title">Tournament <span class="gold">Gallery</span></h2>
+      <p class="section-subtitle">Moments from past seasons</p>
+      <div class="gallery-grid">
+        <div class="gallery-item large">
+          <div class="gallery-placeholder"><i class="fas fa-futbol"></i><span>Match Day Highlights</span></div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-placeholder"><i class="fas fa-trophy"></i><span>Trophy Ceremony</span></div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-placeholder"><i class="fas fa-users"></i><span>Team Photos</span></div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-placeholder"><i class="fas fa-shoe-prints"></i><span>Best Goals</span></div>
+        </div>
+        <div class="gallery-item large">
+          <div class="gallery-placeholder"><i class="fas fa-people-group"></i><span>Fan Zone</span></div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-placeholder"><i class="fas fa-hand-fist"></i><span>Celebrations</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COUNTDOWN ===================== -->
+  <section class="countdown-section">
+    <div class="container">
+      <h2 class="section-title">Tournament <span class="gold">Kicks Off In</span></h2>
+      <div class="countdown" id="countdown">
+        <div class="countdown-item">
+          <span class="countdown-number" id="days">00</span>
+          <span class="countdown-label">Days</span>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <span class="countdown-number" id="hours">00</span>
+          <span class="countdown-label">Hours</span>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <span class="countdown-number" id="minutes">00</span>
+          <span class="countdown-label">Minutes</span>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <span class="countdown-number" id="seconds">00</span>
+          <span class="countdown-label">Seconds</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONTACT / REGISTER ===================== -->
+  <section class="section section-dark" id="contact">
+    <div class="container">
+      <h2 class="section-title">Register Your <span class="gold">Team</span></h2>
+      <p class="section-subtitle">Spots are limited — secure yours today</p>
+      <div class="contact-grid">
+        <form class="register-form" id="registerForm">
+          <div class="form-group">
+            <label for="teamName">Team Name</label>
+            <input type="text" id="teamName" placeholder="e.g. Titans FC" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="captainName">Captain Name</label>
+              <input type="text" id="captainName" placeholder="Full name" required />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone" placeholder="+91 XXXXX XXXXX" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="captain@team.com" required />
+          </div>
+          <div class="form-group">
+            <label for="players">Number of Players</label>
+            <input type="number" id="players" min="18" max="23" placeholder="18–23" required />
+          </div>
+          <div class="form-group">
+            <label for="message">Message (Optional)</label>
+            <textarea id="message" rows="3" placeholder="Anything we should know?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <i class="fas fa-paper-plane"></i> Submit Registration
+          </button>
+        </form>
+
+        <div class="contact-info">
+          <h3>Get in Touch</h3>
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <div>
+              <strong>Email</strong>
+              <p>info@gladiatorleague.com</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            <div>
+              <strong>Phone</strong>
+              <p>+91 98765 43210</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-location-dot"></i>
+            <div>
+              <strong>Venue</strong>
+              <p>Gladiator Arena, Sports Complex, City Center</p>
+            </div>
+          </div>
+          <div class="contact-socials">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">
+            <i class="fas fa-shield-halved"></i>
+            <span>Gladiator<span class="gold">League</span></span>
+          </a>
+          <p>The ultimate amateur football tournament. Where legends clash and champions rise.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#fixtures">Fixtures</a></li>
+            <li><a href="#standings">Standings</a></li>
+            <li><a href="#teams">Teams</a></li>
+            <li><a href="#contact">Register</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Rules & Regulations</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Sponsorship</a></li>
+            <li><a href="#">FAQs</a></li>
+            <li><a href="admin.html" style="color: var(--gold);">Admin Panel</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Gladiator League. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
