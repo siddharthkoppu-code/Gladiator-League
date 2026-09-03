@@ -11,7 +11,8 @@ const STORAGE_KEYS = {
   TEAMS: 'gl_teams',
   FIXTURES: 'gl_fixtures',
   SCORERS: 'gl_scorers',
-  SETTINGS: 'gl_settings'
+  SETTINGS: 'gl_settings',
+  CONTENT: 'gl_content'
 };
 
 // Default data
@@ -42,11 +43,40 @@ const DEFAULT_SETTINGS = {
   totalMatches: 64
 };
 
+const DEFAULT_CONTENT = {
+  heroSubtitle: '⚽ Season 2026 — Registration Open',
+  heroTitle1: 'GLADIATOR',
+  heroTitle2: 'LEAGUE',
+  heroDesc: 'Where legends clash and champions rise. The ultimate football tournament awaits.',
+  matchDays: 30,
+  venueName: 'Gladiator Arena',
+  venueAddress: 'Gladiator Arena, Sports Complex, City Center',
+  formatDesc: '16 teams battle through a round-robin group stage followed by single-elimination knockouts. Every match counts. No room for complacency.',
+  scheduleDesc: 'The tournament runs from October 1 — November 15, 2026. Group stages span 4 weeks, followed by 2 weeks of electrifying knockout rounds.',
+  venueDesc: 'All matches are held at the Gladiator Arena — a state-of-the-art turf ground with floodlights, spectator stands, and live commentary.',
+  prizesDesc: '$5,000 total prize pool. Champions take home the Gladiator Shield trophy, individual awards for Golden Boot, Golden Glove, and MVP.',
+  rulesDesc: 'Standard 11-a-side rules. 45-minute halves in groups, extra time and penalties in knockouts. Fair play points break ties.',
+  eligibilityDesc: 'Open to amateur and semi-pro teams. Each squad registers 18–23 players. Age 16+ with valid ID required for all participants.',
+  contactEmail: 'info@gladiatorleague.com',
+  contactPhone: '+91 98765 43210',
+  socialInstagram: '#',
+  socialTwitter: '#',
+  socialYoutube: '#',
+  socialFacebook: '#',
+  registerTitle: 'Register Your Team',
+  registerSubtitle: 'Spots are limited — secure yours today',
+  minPlayers: 18,
+  maxPlayers: 23,
+  footerTagline: 'The ultimate amateur football tournament. Where legends clash and champions rise.',
+  copyrightText: '© 2026 Gladiator League. All rights reserved.'
+};
+
 // State
 let teams = [];
 let fixtures = [];
 let scorers = [];
 let settings = {};
+let content = {};
 let editingId = null;
 
 // ==================== INITIALIZATION ====================
@@ -79,6 +109,10 @@ function loadData() {
   // Load settings
   const storedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
   settings = storedSettings ? JSON.parse(storedSettings) : {...DEFAULT_SETTINGS};
+
+  // Load content
+  const storedContent = localStorage.getItem(STORAGE_KEYS.CONTENT);
+  content = storedContent ? JSON.parse(storedContent) : {...DEFAULT_CONTENT};
 }
 
 function saveData() {
@@ -86,6 +120,7 @@ function saveData() {
   localStorage.setItem(STORAGE_KEYS.FIXTURES, JSON.stringify(fixtures));
   localStorage.setItem(STORAGE_KEYS.SCORERS, JSON.stringify(scorers));
   localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+  localStorage.setItem(STORAGE_KEYS.CONTENT, JSON.stringify(content));
 }
 
 // ==================== AUTHENTICATION ====================
@@ -131,6 +166,9 @@ function setupEventListeners() {
 
   // Settings
   document.getElementById('settingsForm').addEventListener('submit', handleSettingsSubmit);
+
+  // Content
+  document.getElementById('contentForm').addEventListener('submit', handleContentSubmit);
 }
 
 function showAdminPanel() {
@@ -140,6 +178,7 @@ function showAdminPanel() {
   renderFixtures();
   renderScorers();
   loadSettingsForm();
+  loadContentForm();
 }
 
 function switchSection(section) {
@@ -468,6 +507,68 @@ function handleSettingsSubmit(e) {
   };
   saveData();
   alert('Settings saved successfully!');
+}
+
+// ==================== WEBSITE CONTENT ====================
+function loadContentForm() {
+  document.getElementById('heroSubtitle').value = content.heroSubtitle || DEFAULT_CONTENT.heroSubtitle;
+  document.getElementById('heroTitle1').value = content.heroTitle1 || DEFAULT_CONTENT.heroTitle1;
+  document.getElementById('heroTitle2').value = content.heroTitle2 || DEFAULT_CONTENT.heroTitle2;
+  document.getElementById('heroDesc').value = content.heroDesc || DEFAULT_CONTENT.heroDesc;
+  document.getElementById('matchDays').value = content.matchDays || DEFAULT_CONTENT.matchDays;
+  document.getElementById('venueName').value = content.venueName || DEFAULT_CONTENT.venueName;
+  document.getElementById('venueAddress').value = content.venueAddress || DEFAULT_CONTENT.venueAddress;
+  document.getElementById('formatDesc').value = content.formatDesc || DEFAULT_CONTENT.formatDesc;
+  document.getElementById('scheduleDesc').value = content.scheduleDesc || DEFAULT_CONTENT.scheduleDesc;
+  document.getElementById('venueDesc').value = content.venueDesc || DEFAULT_CONTENT.venueDesc;
+  document.getElementById('prizesDesc').value = content.prizesDesc || DEFAULT_CONTENT.prizesDesc;
+  document.getElementById('rulesDesc').value = content.rulesDesc || DEFAULT_CONTENT.rulesDesc;
+  document.getElementById('eligibilityDesc').value = content.eligibilityDesc || DEFAULT_CONTENT.eligibilityDesc;
+  document.getElementById('contactEmail').value = content.contactEmail || DEFAULT_CONTENT.contactEmail;
+  document.getElementById('contactPhone').value = content.contactPhone || DEFAULT_CONTENT.contactPhone;
+  document.getElementById('socialInstagram').value = content.socialInstagram || DEFAULT_CONTENT.socialInstagram;
+  document.getElementById('socialTwitter').value = content.socialTwitter || DEFAULT_CONTENT.socialTwitter;
+  document.getElementById('socialYoutube').value = content.socialYoutube || DEFAULT_CONTENT.socialYoutube;
+  document.getElementById('socialFacebook').value = content.socialFacebook || DEFAULT_CONTENT.socialFacebook;
+  document.getElementById('registerTitle').value = content.registerTitle || DEFAULT_CONTENT.registerTitle;
+  document.getElementById('registerSubtitle').value = content.registerSubtitle || DEFAULT_CONTENT.registerSubtitle;
+  document.getElementById('minPlayers').value = content.minPlayers || DEFAULT_CONTENT.minPlayers;
+  document.getElementById('maxPlayers').value = content.maxPlayers || DEFAULT_CONTENT.maxPlayers;
+  document.getElementById('footerTagline').value = content.footerTagline || DEFAULT_CONTENT.footerTagline;
+  document.getElementById('copyrightText').value = content.copyrightText || DEFAULT_CONTENT.copyrightText;
+}
+
+function handleContentSubmit(e) {
+  e.preventDefault();
+  content = {
+    heroSubtitle: document.getElementById('heroSubtitle').value,
+    heroTitle1: document.getElementById('heroTitle1').value,
+    heroTitle2: document.getElementById('heroTitle2').value,
+    heroDesc: document.getElementById('heroDesc').value,
+    matchDays: parseInt(document.getElementById('matchDays').value),
+    venueName: document.getElementById('venueName').value,
+    venueAddress: document.getElementById('venueAddress').value,
+    formatDesc: document.getElementById('formatDesc').value,
+    scheduleDesc: document.getElementById('scheduleDesc').value,
+    venueDesc: document.getElementById('venueDesc').value,
+    prizesDesc: document.getElementById('prizesDesc').value,
+    rulesDesc: document.getElementById('rulesDesc').value,
+    eligibilityDesc: document.getElementById('eligibilityDesc').value,
+    contactEmail: document.getElementById('contactEmail').value,
+    contactPhone: document.getElementById('contactPhone').value,
+    socialInstagram: document.getElementById('socialInstagram').value,
+    socialTwitter: document.getElementById('socialTwitter').value,
+    socialYoutube: document.getElementById('socialYoutube').value,
+    socialFacebook: document.getElementById('socialFacebook').value,
+    registerTitle: document.getElementById('registerTitle').value,
+    registerSubtitle: document.getElementById('registerSubtitle').value,
+    minPlayers: parseInt(document.getElementById('minPlayers').value),
+    maxPlayers: parseInt(document.getElementById('maxPlayers').value),
+    footerTagline: document.getElementById('footerTagline').value,
+    copyrightText: document.getElementById('copyrightText').value
+  };
+  saveData();
+  alert('Website content saved successfully! Refresh the main website to see changes.');
 }
 
 // ==================== UTILS ====================

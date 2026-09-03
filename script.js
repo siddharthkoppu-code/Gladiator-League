@@ -30,22 +30,53 @@ const DEFAULT_SETTINGS = {
   totalMatches: 64
 };
 
+const DEFAULT_CONTENT = {
+  heroSubtitle: '⚽ Season 2026 — Registration Open',
+  heroTitle1: 'GLADIATOR',
+  heroTitle2: 'LEAGUE',
+  heroDesc: 'Where legends clash and champions rise. The ultimate football tournament awaits.',
+  matchDays: 30,
+  venueName: 'Gladiator Arena',
+  venueAddress: 'Gladiator Arena, Sports Complex, City Center',
+  formatDesc: '16 teams battle through a round-robin group stage followed by single-elimination knockouts. Every match counts. No room for complacency.',
+  scheduleDesc: 'The tournament runs from October 1 — November 15, 2026. Group stages span 4 weeks, followed by 2 weeks of electrifying knockout rounds.',
+  venueDesc: 'All matches are held at the Gladiator Arena — a state-of-the-art turf ground with floodlights, spectator stands, and live commentary.',
+  prizesDesc: '$5,000 total prize pool. Champions take home the Gladiator Shield trophy, individual awards for Golden Boot, Golden Glove, and MVP.',
+  rulesDesc: 'Standard 11-a-side rules. 45-minute halves in groups, extra time and penalties in knockouts. Fair play points break ties.',
+  eligibilityDesc: 'Open to amateur and semi-pro teams. Each squad registers 18–23 players. Age 16+ with valid ID required for all participants.',
+  contactEmail: 'info@gladiatorleague.com',
+  contactPhone: '+91 98765 43210',
+  socialInstagram: '#',
+  socialTwitter: '#',
+  socialYoutube: '#',
+  socialFacebook: '#',
+  registerTitle: 'Register Your Team',
+  registerSubtitle: 'Spots are limited — secure yours today',
+  minPlayers: 18,
+  maxPlayers: 23,
+  footerTagline: 'The ultimate amateur football tournament. Where legends clash and champions rise.',
+  copyrightText: '© 2026 Gladiator League. All rights reserved.'
+};
+
 // Load from localStorage or use defaults
 let TEAMS = [];
 let FIXTURES = [];
 let SCORERS = [];
 let SETTINGS = {};
+let CONTENT = {};
 
 try {
   TEAMS = JSON.parse(localStorage.getItem('gl_teams')) || DEFAULT_TEAMS;
   FIXTURES = JSON.parse(localStorage.getItem('gl_fixtures')) || [];
   SCORERS = JSON.parse(localStorage.getItem('gl_scorers')) || [];
   SETTINGS = JSON.parse(localStorage.getItem('gl_settings')) || DEFAULT_SETTINGS;
+  CONTENT = JSON.parse(localStorage.getItem('gl_content')) || DEFAULT_CONTENT;
 } catch (e) {
   TEAMS = DEFAULT_TEAMS;
   FIXTURES = [];
   SCORERS = [];
   SETTINGS = DEFAULT_SETTINGS;
+  CONTENT = DEFAULT_CONTENT;
 }
 
 const STANDINGS = {
@@ -130,12 +161,86 @@ function animateCounters() {
 // Update hero stats with admin settings
 document.addEventListener('DOMContentLoaded', () => {
   const statNumbers = document.querySelectorAll('.stat-number');
-  if (statNumbers.length >= 3) {
+  if (statNumbers.length >= 4) {
     statNumbers[0].dataset.target = SETTINGS.totalTeams || 16;
     statNumbers[1].dataset.target = SETTINGS.totalMatches || 64;
     statNumbers[2].dataset.target = SETTINGS.prizeMoney || 5000;
+    statNumbers[3].dataset.target = CONTENT.matchDays || 30;
   }
+
+  // Apply all dynamic content to the website
+  applyWebsiteContent();
 });
+
+// ---------- Apply Dynamic Website Content ----------
+function applyWebsiteContent() {
+  // Hero
+  const heroSubtitle = document.querySelector('.hero-subtitle');
+  if (heroSubtitle && CONTENT.heroSubtitle) heroSubtitle.textContent = CONTENT.heroSubtitle;
+
+  const heroTitle = document.querySelector('.hero-title');
+  if (heroTitle && (CONTENT.heroTitle1 || CONTENT.heroTitle2)) {
+    heroTitle.innerHTML = `${CONTENT.heroTitle1 || 'GLADIATOR'}<br /><span class="gold">${CONTENT.heroTitle2 || 'LEAGUE'}</span>`;
+  }
+
+  const heroDesc = document.querySelector('.hero-desc');
+  if (heroDesc && CONTENT.heroDesc) heroDesc.textContent = CONTENT.heroDesc;
+
+  // About Cards
+  const aboutCards = document.querySelectorAll('.about-card');
+  if (aboutCards.length >= 6) {
+    if (CONTENT.formatDesc) aboutCards[0].querySelector('p').textContent = CONTENT.formatDesc;
+    if (CONTENT.scheduleDesc) aboutCards[1].querySelector('p').textContent = CONTENT.scheduleDesc;
+    if (CONTENT.venueDesc) aboutCards[2].querySelector('p').textContent = CONTENT.venueDesc;
+    if (CONTENT.prizesDesc) aboutCards[3].querySelector('p').textContent = CONTENT.prizesDesc;
+    if (CONTENT.rulesDesc) aboutCards[4].querySelector('p').textContent = CONTENT.rulesDesc;
+    if (CONTENT.eligibilityDesc) aboutCards[5].querySelector('p').textContent = CONTENT.eligibilityDesc;
+  }
+
+  // Contact Info
+  const contactItems = document.querySelectorAll('.contact-item');
+  if (contactItems.length >= 3) {
+    if (CONTENT.contactEmail) contactItems[0].querySelector('p').textContent = CONTENT.contactEmail;
+    if (CONTENT.contactPhone) contactItems[1].querySelector('p').textContent = CONTENT.contactPhone;
+    if (CONTENT.venueAddress) contactItems[2].querySelector('p').textContent = CONTENT.venueAddress;
+  }
+
+  // Social Links
+  const socialLinks = document.querySelectorAll('.contact-socials a');
+  if (socialLinks.length >= 4) {
+    if (CONTENT.socialInstagram) socialLinks[0].href = CONTENT.socialInstagram;
+    if (CONTENT.socialTwitter) socialLinks[1].href = CONTENT.socialTwitter;
+    if (CONTENT.socialYoutube) socialLinks[2].href = CONTENT.socialYoutube;
+    if (CONTENT.socialFacebook) socialLinks[3].href = CONTENT.socialFacebook;
+  }
+
+  // Registration Form
+  const registerSection = document.getElementById('contact');
+  if (registerSection) {
+    const regTitle = registerSection.querySelector('.section-title');
+    const regSubtitle = registerSection.querySelector('.section-subtitle');
+    if (regTitle && CONTENT.registerTitle) {
+      regTitle.innerHTML = `${CONTENT.registerTitle.replace('Team', '')} <span class="gold">Team</span>`;
+    }
+    if (regSubtitle && CONTENT.registerSubtitle) regSubtitle.textContent = CONTENT.registerSubtitle;
+  }
+
+  const playersInput = document.getElementById('players');
+  if (playersInput) {
+    if (CONTENT.minPlayers) playersInput.min = CONTENT.minPlayers;
+    if (CONTENT.maxPlayers) playersInput.max = CONTENT.maxPlayers;
+    if (CONTENT.minPlayers && CONTENT.maxPlayers) {
+      playersInput.placeholder = `${CONTENT.minPlayers}–${CONTENT.maxPlayers}`;
+    }
+  }
+
+  // Footer
+  const footerBrandDesc = document.querySelector('.footer-brand p');
+  if (footerBrandDesc && CONTENT.footerTagline) footerBrandDesc.textContent = CONTENT.footerTagline;
+
+  const footerCopyright = document.querySelector('.footer-bottom p');
+  if (footerCopyright && CONTENT.copyrightText) footerCopyright.textContent = CONTENT.copyrightText;
+}
 
 // ---------- Hero particles ----------
 function createParticles() {
