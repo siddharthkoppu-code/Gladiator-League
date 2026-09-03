@@ -12,9 +12,13 @@ const STORAGE_KEYS = {
   FIXTURES: 'gl_fixtures',
   SCORERS: 'gl_scorers',
   SETTINGS: 'gl_settings',
+<<<<<<< HEAD
   CONTENT: 'gl_content',
   REGISTRATIONS: 'gl_registrations',
   GALLERY: 'gl_gallery'
+=======
+  CONTENT: 'gl_content'
+>>>>>>> origin/main
 };
 
 // Default data
@@ -79,8 +83,11 @@ let fixtures = [];
 let scorers = [];
 let settings = {};
 let content = {};
+<<<<<<< HEAD
 let registrations = [];
 let gallery = [];
+=======
+>>>>>>> origin/main
 let editingId = null;
 
 // ==================== INITIALIZATION ====================
@@ -117,6 +124,7 @@ function loadData() {
   // Load content
   const storedContent = localStorage.getItem(STORAGE_KEYS.CONTENT);
   content = storedContent ? JSON.parse(storedContent) : {...DEFAULT_CONTENT};
+<<<<<<< HEAD
 
   // Load registrations
   const storedRegistrations = localStorage.getItem(STORAGE_KEYS.REGISTRATIONS);
@@ -125,6 +133,8 @@ function loadData() {
   // Load gallery
   const storedGallery = localStorage.getItem(STORAGE_KEYS.GALLERY);
   gallery = storedGallery ? JSON.parse(storedGallery) : [];
+=======
+>>>>>>> origin/main
 }
 
 function saveData() {
@@ -133,8 +143,11 @@ function saveData() {
   localStorage.setItem(STORAGE_KEYS.SCORERS, JSON.stringify(scorers));
   localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
   localStorage.setItem(STORAGE_KEYS.CONTENT, JSON.stringify(content));
+<<<<<<< HEAD
   localStorage.setItem(STORAGE_KEYS.REGISTRATIONS, JSON.stringify(registrations));
   localStorage.setItem(STORAGE_KEYS.GALLERY, JSON.stringify(gallery));
+=======
+>>>>>>> origin/main
 }
 
 // ==================== AUTHENTICATION ====================
@@ -183,6 +196,7 @@ function setupEventListeners() {
 
   // Content
   document.getElementById('contentForm').addEventListener('submit', handleContentSubmit);
+<<<<<<< HEAD
 
   // Registrations
   document.getElementById('exportRegistrationsBtn').addEventListener('click', exportRegistrationsCSV);
@@ -221,6 +235,8 @@ function setupEventListeners() {
       }
     });
   }
+=======
+>>>>>>> origin/main
 }
 
 function showAdminPanel() {
@@ -229,8 +245,11 @@ function showAdminPanel() {
   renderTeams();
   renderFixtures();
   renderScorers();
+<<<<<<< HEAD
   renderRegistrations();
   renderGallery();
+=======
+>>>>>>> origin/main
   loadSettingsForm();
   loadContentForm();
 }
@@ -625,6 +644,7 @@ function handleContentSubmit(e) {
   alert('Website content saved successfully! Refresh the main website to see changes.');
 }
 
+<<<<<<< HEAD
 // ==================== REGISTRATIONS ====================
 function renderRegistrations() {
   const container = document.getElementById('registrationsList');
@@ -890,6 +910,8 @@ function deleteGallery(id) {
   }
 }
 
+=======
+>>>>>>> origin/main
 // ==================== UTILS ====================
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove('active');
@@ -902,11 +924,14 @@ window.editFixture = editFixture;
 window.deleteFixture = deleteFixture;
 window.editScorer = editScorer;
 window.deleteScorer = deleteScorer;
+<<<<<<< HEAD
 window.viewRegistration = viewRegistration;
 window.updateRegistrationStatus = updateRegistrationStatus;
 window.deleteRegistration = deleteRegistration;
 window.editGallery = editGallery;
 window.deleteGallery = deleteGallery;
+=======
+>>>>>>> origin/main
 window.closeModal = closeModal;
 
 // Initialize
