@@ -958,6 +958,299 @@ function deleteGallery(id) {
   }
 }
 
+// ==================== STANDINGS MANAGEMENT ====================
+function calculateStandingsFromFixtures() {
+  const standingsMap = {};
+
+  // Initialize all teams
+  teams.forEach(t => {
+    standingsMap[t.name] = {
+      team: t.name,
+      group: t.group || 'A',
+      played: 0,
+      won: 0,
+      drawn: 0,
+      lost: 0,
+      gf: 0,
+      ga: 0,
+      gd: 0,
+      pts: 0
+    };
+  });
+
+  // Calculate from finished fixtures
+  fixtures.filter(f => f.status === 'Finished' && f.homeScore !== null && f.awayScore !== null).forEach(f => {
+    const homeTeam = teams.find(t => t.id === f.homeTeamId);
+    const awayTeam = teams.find(t => t.id === f.awayTeamId);
+
+    if (homeTeam && awayTeam) {
+      if (!standingsMap[homeTeam.name]) {
+        standingsMap[homeTeam.name] = { team: homeTeam.name, group: homeTeam.group || 'A', played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, pts: 0 };
+      }
+      if (!standingsMap[awayTeam.name]) {
+        standingsMap[awayTeam.name] = { team: awayTeam.name, group: awayTeam.group || 'A', played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, pts: 0 };
+      }
+
+      const hStats = standingsMap[homeTeam.name];
+      const aStats = standingsMap[awayTeam.name];
+
+      hStats.played += 1;
+      aStats.played += 1;
+      hStats.gf += f.homeScore;
+      hStats.ga += f.awayScore;
+      aStats.gf += f.awayScore;
+      aStats.ga += f.homeScore;
+
+      if (f.homeScore > f.awayScore) {
+        hStats.won += 1;
+        hStats.pts += 3;
+        aStats.lost += 1;
+      } else if (f.homeScore < f.awayScore) {
+        aStats.won += 1;
+        aStats.pts += 3;
+        hStats.lost += 1;
+      } else {
+        hStats.drawn += 1;
+        hStats.pts += 1;
+        aStats.drawn += 1;
+        aStats.pts += 1;
+      }
+
+      hStats.gd = hStats.gf - hStats.ga;
+      aStats.gd = aStats.gf - aStats.ga;
+    }
+  });
+
+  return Object.values(standingsMap);
+}
+
+function getActiveStandings() {
+  if (settings.autoCalculateStandings) {
+    return calculateStandingsFromFixtures();
+  }
+  return standings;
+}
+
+function renderStandings() {
+  const container = document.getElementById('standingsList');
+  const allStandings = getActiveStandings();
+  const groupStandings = allStandings.filter(s => (s.group || 'A') === currentStandingsGroup);
+
+  // Sort by Points DESC, GD DESC, GF DESC
+  groupStandings.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+
+  const autoCalcCheckbox = document.getElementById('autoCalculateStandings');
+  if (autoCalcCheckbox) {
+    autoCalcCheckbox.checked = !!settings.autoCalculateStandings;
+  }
+
+  const addBtn = document.getElementById('addStandingBtn');
+  if (addBtn) {
+    addBtn.style.display = settings.autoCalculateStandings ? 'none' : 'inline-flex';
+  }
+
+  if (groupStandings.length === 0) {
+    container.innerHTML = `<p style="color: var(--text-dim); text-align: center; padding: 40px;">No teams in Group ${currentStandingsGroup}. ${settings.autoCalculateStandings ? 'Assign teams to Group ' + currentStandingsGroup + ' in Teams management.' : 'Click "Add Entry" to add standings manually.'}</p>`;
+    return;
+  }
+
+  container.innerHTML = groupStandings.map((entry, index) => `
+    <div class="standing-card">
+      <div class="standing-card-header">
+        <div class="standing-rank">${index + 1}</div>
+        <div class="standing-team-name">${entry.team}</div>
+        <span style="color: var(--text-dim); font-size: 0.85rem;">Group ${entry.group || 'A'}</span>
+      </div>
+      <div class="standing-stats">
+        <div class="standing-stat"><span class="stat-label">P</span><span class="stat-value">${entry.played || 0}</span></div>
+        <div class="standing-stat"><span class="stat-label">W</span><span class="stat-value">${entry.won || 0}</span></div>
+        <div class="standing-stat"><span class="stat-label">D</span><span class="stat-value">${entry.drawn || 0}</span></div>
+        <div class="standing-stat"><span class="stat-label">L</span><span class="stat-value">${entry.lost || 0}</span></div>
+        <div class="standing-stat"><span class="stat-label">GF</span><span class="stat-value">${entry.gf || 0}</span></div>
+        <div class="standing-stat"><span class="stat-label">GA</span><span class="stat-value">${entry.ga || 0}</span></div>
+        <div class="standing-stat"><span class="stat-label">GD</span><span class="stat-value">${(entry.gd > 0 ? '+' : '') + (entry.gd || 0)}</span></div>
+        <div class="standing-stat"><span class="stat-label">PTS</span><span class="stat-value stat-pts">${entry.pts || 0}</span></div>
+      </div>
+      ${!settings.autoCalculateStandings ? `
+        <div class="card-actions" style="margin-top: 12px; border-top: 1px solid var(--border); padding-top: 8px;">
+          <button class="icon-btn" onclick="editStanding(${entry.id || "'" + entry.team + "'"})">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <button class="icon-btn danger" onclick="deleteStanding(${entry.id || "'" + entry.team + "'"})">
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function openStandingModal(standingId = null) {
+  editingId = standingId;
+  const modal = document.getElementById('standingModal');
+  const title = document.getElementById('standingModalTitle');
+  const form = document.getElementById('standingForm');
+
+  if (standingId) {
+    const entry = standings.find(s => s.id === standingId || s.team === standingId);
+    title.textContent = 'Edit Standing Entry';
+    document.getElementById('standingId').value = entry.id || entry.team;
+    document.getElementById('standingTeam').value = entry.team;
+    document.getElementById('standingGroup').value = entry.group || 'A';
+    document.getElementById('standingPlayed').value = entry.played || 0;
+    document.getElementById('standingWon').value = entry.won || 0;
+    document.getElementById('standingDrawn').value = entry.drawn || 0;
+    document.getElementById('standingLost').value = entry.lost || 0;
+    document.getElementById('standingGF').value = entry.gf || 0;
+    document.getElementById('standingGA').value = entry.ga || 0;
+    document.getElementById('standingPts').value = entry.pts || 0;
+  } else {
+    title.textContent = 'Add Standing Entry';
+    form.reset();
+    document.getElementById('standingId').value = '';
+    document.getElementById('standingGroup').value = currentStandingsGroup;
+  }
+
+  modal.classList.add('active');
+}
+
+function handleStandingSubmit(e) {
+  e.preventDefault();
+  const id = document.getElementById('standingId').value;
+  const played = parseInt(document.getElementById('standingPlayed').value) || 0;
+  const won = parseInt(document.getElementById('standingWon').value) || 0;
+  const drawn = parseInt(document.getElementById('standingDrawn').value) || 0;
+  const lost = parseInt(document.getElementById('standingLost').value) || 0;
+  const gf = parseInt(document.getElementById('standingGF').value) || 0;
+  const ga = parseInt(document.getElementById('standingGA').value) || 0;
+  const pts = parseInt(document.getElementById('standingPts').value) || 0;
+
+  const standingData = {
+    id: id ? (isNaN(id) ? id : parseInt(id)) : Date.now(),
+    team: document.getElementById('standingTeam').value,
+    group: document.getElementById('standingGroup').value,
+    played,
+    won,
+    drawn,
+    lost,
+    gf,
+    ga,
+    gd: gf - ga,
+    pts
+  };
+
+  if (id) {
+    const index = standings.findIndex(s => s.id === id || s.id === parseInt(id) || s.team === id);
+    if (index !== -1) {
+      standings[index] = standingData;
+    } else {
+      standings.push(standingData);
+    }
+  } else {
+    standings.push(standingData);
+  }
+
+  saveData();
+  renderStandings();
+  closeModal('standingModal');
+}
+
+function editStanding(id) {
+  openStandingModal(id);
+}
+
+function deleteStanding(id) {
+  if (confirm('Are you sure you want to delete this standing entry?')) {
+    standings = standings.filter(s => s.id !== id && s.team !== id && s.id !== parseInt(id));
+    saveData();
+    renderStandings();
+  }
+}
+
+// ==================== TEAM ROSTER HELPERS ====================
+function renderRosterInputs(roster = []) {
+  const container = document.getElementById('rosterPlayersContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  if (roster && roster.length > 0) {
+    roster.forEach(player => {
+      addRosterPlayerRow(player);
+    });
+  } else {
+    // Add default captain row
+    const captainName = document.getElementById('teamCaptain')?.value || '';
+    addRosterPlayerRow({ number: '10', name: captainName, position: 'MID', isCaptain: true });
+  }
+}
+
+function addRosterPlayerRow(player = { number: '', name: '', position: 'MID', isCaptain: false }) {
+  const container = document.getElementById('rosterPlayersContainer');
+  if (!container) return;
+  const div = document.createElement('div');
+  div.className = 'roster-player-row';
+  div.innerHTML = `
+    <input type="number" class="roster-num" placeholder="#" value="${player.number || ''}" style="width: 60px; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text);" min="1" max="99" />
+    <input type="text" class="roster-name" placeholder="Player Name" value="${player.name || ''}" style="flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text);" />
+    <select class="roster-pos" style="width: 80px; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text);">
+      <option value="GK" ${player.position === 'GK' ? 'selected' : ''}>GK</option>
+      <option value="DEF" ${player.position === 'DEF' ? 'selected' : ''}>DEF</option>
+      <option value="MID" ${player.position === 'MID' ? 'selected' : ''}>MID</option>
+      <option value="FWD" ${player.position === 'FWD' ? 'selected' : ''}>FWD</option>
+    </select>
+    <label style="display: flex; align-items: center; gap: 4px; font-size: 0.8rem; cursor: pointer; color: var(--gold);">
+      <input type="checkbox" class="roster-captain" ${player.isCaptain ? 'checked' : ''} /> (C)
+    </label>
+    <button type="button" class="icon-btn danger" onclick="this.parentElement.remove()" style="padding: 4px 8px;">
+      <i class="fas fa-trash"></i>
+    </button>
+  `;
+  container.appendChild(div);
+}
+
+function getRosterFromInputs() {
+  const container = document.getElementById('rosterPlayersContainer');
+  if (!container) return [];
+  const rows = container.querySelectorAll('.roster-player-row');
+  const roster = [];
+  rows.forEach(row => {
+    const number = row.querySelector('.roster-num').value.trim();
+    const name = row.querySelector('.roster-name').value.trim();
+    const position = row.querySelector('.roster-pos').value;
+    const isCaptain = row.querySelector('.roster-captain').checked;
+    if (name) {
+      roster.push({ number, name, position, isCaptain });
+    }
+  });
+  return roster;
+}
+
+// ==================== PASSWORD CHANGE ====================
+function handlePasswordChangeSubmit(e) {
+  e.preventDefault();
+  const currentPass = document.getElementById('currentPassword').value;
+  const newPass = document.getElementById('newPassword').value;
+  const confirmPass = document.getElementById('confirmPassword').value;
+
+  if (currentPass !== getAdminPassword()) {
+    alert('Current password is incorrect!');
+    return;
+  }
+
+  if (newPass.length < 6) {
+    alert('New password must be at least 6 characters long!');
+    return;
+  }
+
+  if (newPass !== confirmPass) {
+    alert('New passwords do not match!');
+    return;
+  }
+
+  setAdminPassword(newPass);
+  alert('Password changed successfully! Please remember your new password.');
+  closeModal('passwordModal');
+}
+
 // ==================== UTILS ====================
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove('active');
@@ -975,7 +1268,11 @@ window.updateRegistrationStatus = updateRegistrationStatus;
 window.deleteRegistration = deleteRegistration;
 window.editGallery = editGallery;
 window.deleteGallery = deleteGallery;
+window.editStanding = editStanding;
+window.deleteStanding = deleteStanding;
 window.closeModal = closeModal;
+window.addRosterPlayerRow = addRosterPlayerRow;
 
 // Initialize
 init();
+
