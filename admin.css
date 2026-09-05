@@ -767,6 +767,148 @@ body {
   margin-bottom: 12px;
 }
 
+/* ==================== STANDINGS TABS ==================== */
+.standings-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.standing-tab {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.standing-tab:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.standing-tab.active {
+  background: var(--gold);
+  color: #0a0a0f;
+  border-color: var(--gold);
+}
+
+.standing-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  transition: var(--transition);
+}
+
+.standing-card:hover {
+  border-color: var(--gold);
+}
+
+.standing-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.standing-position {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  color: var(--gold);
+  min-width: 30px;
+}
+
+.standing-stats {
+  display: flex;
+  gap: 20px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+}
+
+.standing-stats span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.standing-stats strong {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+/* ==================== ROSTER PLAYER ROWS ==================== */
+.roster-player-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.roster-player-row input[type="number"],
+.roster-player-row input[type="text"],
+.roster-player-row select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.roster-player-row input[type="number"] {
+  width: 50px;
+}
+
+.roster-player-row input[type="text"] {
+  flex: 1;
+  min-width: 120px;
+}
+
+.roster-player-row select {
+  width: 70px;
+}
+
+.roster-player-row button {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.8rem;
+}
+
+.roster-player-row button:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.roster-player-row .captain-badge {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--gold);
+  color: #0a0a0f;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
   .sidebar {

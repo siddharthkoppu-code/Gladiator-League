@@ -2,24 +2,24 @@
    GLADIATOR LEAGUE — Admin Panel Script
    ======================================== */
 
-// Default password
-const ADMIN_PASSWORD = 'gladiator2026';
-
 // Storage keys
 const STORAGE_KEYS = {
   AUTH: 'gl_admin_auth',
+  PASSWORD: 'gl_admin_password',
   TEAMS: 'gl_teams',
   FIXTURES: 'gl_fixtures',
   SCORERS: 'gl_scorers',
   SETTINGS: 'gl_settings',
-<<<<<<< HEAD
   CONTENT: 'gl_content',
   REGISTRATIONS: 'gl_registrations',
-  GALLERY: 'gl_gallery'
-=======
-  CONTENT: 'gl_content'
->>>>>>> origin/main
+  GALLERY: 'gl_gallery',
+  STANDINGS: 'gl_standings'
 };
+
+// Get admin password (from storage or default)
+function getAdminPassword() {
+  return localStorage.getItem(STORAGE_KEYS.PASSWORD) || 'gladiator2026';
+}
 
 // Default data
 const DEFAULT_TEAMS = [
@@ -45,8 +45,15 @@ const DEFAULT_SETTINGS = {
   startDate: '2026-10-01',
   endDate: '2026-11-15',
   prizeMoney: 5000,
+  prize1st: 2000,
+  prize2nd: 1000,
+  prize3rd: 500,
+  prizeGoldenBoot: 300,
+  prizeGoldenGlove: 300,
+  prizeMVP: 500,
   totalTeams: 16,
-  totalMatches: 64
+  totalMatches: 64,
+  autoCalculateStandings: true
 };
 
 const DEFAULT_CONTENT = {
@@ -81,14 +88,14 @@ const DEFAULT_CONTENT = {
 let teams = [];
 let fixtures = [];
 let scorers = [];
+let standings = [];
 let settings = {};
 let content = {};
-<<<<<<< HEAD
 let registrations = [];
 let gallery = [];
-=======
->>>>>>> origin/main
 let editingId = null;
+let currentStandingsGroup = 'A';
+let tempRoster = [];
 
 // ==================== INITIALIZATION ====================
 function init() {
@@ -124,8 +131,6 @@ function loadData() {
   // Load content
   const storedContent = localStorage.getItem(STORAGE_KEYS.CONTENT);
   content = storedContent ? JSON.parse(storedContent) : {...DEFAULT_CONTENT};
-<<<<<<< HEAD
-
   // Load registrations
   const storedRegistrations = localStorage.getItem(STORAGE_KEYS.REGISTRATIONS);
   registrations = storedRegistrations ? JSON.parse(storedRegistrations) : [];
@@ -133,8 +138,10 @@ function loadData() {
   // Load gallery
   const storedGallery = localStorage.getItem(STORAGE_KEYS.GALLERY);
   gallery = storedGallery ? JSON.parse(storedGallery) : [];
-=======
->>>>>>> origin/main
+
+  // Load standings
+  const storedStandings = localStorage.getItem(STORAGE_KEYS.STANDINGS);
+  standings = storedStandings ? JSON.parse(storedStandings) : [];
 }
 
 function saveData() {
@@ -143,11 +150,9 @@ function saveData() {
   localStorage.setItem(STORAGE_KEYS.SCORERS, JSON.stringify(scorers));
   localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
   localStorage.setItem(STORAGE_KEYS.CONTENT, JSON.stringify(content));
-<<<<<<< HEAD
   localStorage.setItem(STORAGE_KEYS.REGISTRATIONS, JSON.stringify(registrations));
   localStorage.setItem(STORAGE_KEYS.GALLERY, JSON.stringify(gallery));
-=======
->>>>>>> origin/main
+  localStorage.setItem(STORAGE_KEYS.STANDINGS, JSON.stringify(standings));
 }
 
 // ==================== AUTHENTICATION ====================
@@ -156,7 +161,7 @@ function setupEventListeners() {
   document.getElementById('loginForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const password = document.getElementById('password').value;
-    if (password === ADMIN_PASSWORD) {
+    if (password === getAdminPassword()) {
       localStorage.setItem(STORAGE_KEYS.AUTH, 'true');
       showAdminPanel();
     } else {
@@ -196,7 +201,6 @@ function setupEventListeners() {
 
   // Content
   document.getElementById('contentForm').addEventListener('submit', handleContentSubmit);
-<<<<<<< HEAD
 
   // Registrations
   document.getElementById('exportRegistrationsBtn').addEventListener('click', exportRegistrationsCSV);
@@ -205,6 +209,55 @@ function setupEventListeners() {
   // Gallery
   document.getElementById('addGalleryBtn').addEventListener('click', () => openGalleryModal());
   document.getElementById('galleryForm').addEventListener('submit', handleGallerySubmit);
+
+  // Standings
+  const addStandingBtn = document.getElementById('addStandingBtn');
+  if (addStandingBtn) {
+    addStandingBtn.addEventListener('click', () => openStandingModal());
+  }
+  const standingForm = document.getElementById('standingForm');
+  if (standingForm) {
+    standingForm.addEventListener('submit', handleStandingSubmit);
+  }
+  const autoCalcCheck = document.getElementById('autoCalculateStandings');
+  if (autoCalcCheck) {
+    autoCalcCheck.addEventListener('change', (e) => {
+      settings.autoCalculateStandings = e.target.checked;
+      saveData();
+      renderStandings();
+    });
+  }
+
+  // Standings tabs
+  document.querySelectorAll('.standing-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      document.querySelectorAll('.standing-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentStandingsGroup = tab.dataset.group;
+      renderStandings();
+    });
+  });
+
+  // Password Change
+  const changePasswordBtn = document.getElementById('changePasswordBtn');
+  if (changePasswordBtn) {
+    changePasswordBtn.addEventListener('click', () => {
+      document.getElementById('passwordForm').reset();
+      document.getElementById('passwordModal').classList.add('active');
+    });
+  }
+  const passwordForm = document.getElementById('passwordForm');
+  if (passwordForm) {
+    passwordForm.addEventListener('submit', handlePasswordChangeSubmit);
+  }
+
+  // Team Roster Add Player
+  const addRosterPlayerBtn = document.getElementById('addRosterPlayerBtn');
+  if (addRosterPlayerBtn) {
+    addRosterPlayerBtn.addEventListener('click', () => {
+      addRosterPlayerRow();
+    });
+  }
 
   // Gallery image preview
   const fileInput = document.getElementById('imageFile');
@@ -235,8 +288,6 @@ function setupEventListeners() {
       }
     });
   }
-=======
->>>>>>> origin/main
 }
 
 function showAdminPanel() {
@@ -245,11 +296,8 @@ function showAdminPanel() {
   renderTeams();
   renderFixtures();
   renderScorers();
-<<<<<<< HEAD
   renderRegistrations();
   renderGallery();
-=======
->>>>>>> origin/main
   loadSettingsForm();
   loadContentForm();
 }
@@ -910,8 +958,6 @@ function deleteGallery(id) {
   }
 }
 
-=======
->>>>>>> origin/main
 // ==================== UTILS ====================
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove('active');
@@ -924,14 +970,11 @@ window.editFixture = editFixture;
 window.deleteFixture = deleteFixture;
 window.editScorer = editScorer;
 window.deleteScorer = deleteScorer;
-<<<<<<< HEAD
 window.viewRegistration = viewRegistration;
 window.updateRegistrationStatus = updateRegistrationStatus;
 window.deleteRegistration = deleteRegistration;
 window.editGallery = editGallery;
 window.deleteGallery = deleteGallery;
-=======
->>>>>>> origin/main
 window.closeModal = closeModal;
 
 // Initialize

@@ -54,6 +54,9 @@
         <a href="#" class="nav-item" data-section="content">
           <i class="fas fa-edit"></i> Website Content
         </a>
+        <a href="#" class="nav-item" data-section="standings">
+          <i class="fas fa-table"></i> Standings
+        </a>
         <a href="#" class="nav-item" data-section="settings">
           <i class="fas fa-cog"></i> Settings
         </a>
@@ -273,36 +276,99 @@
         </form>
       </section>
 
+      <!-- STANDINGS SECTION -->
+      <section class="content-section" id="standingsSection">
+        <div class="section-header">
+          <h2><i class="fas fa-table"></i> Standings & Points Table</h2>
+          <button class="btn-primary" id="addStandingBtn">
+            <i class="fas fa-plus"></i> Add Entry
+          </button>
+        </div>
+        <div style="margin-bottom: 24px; padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);">
+          <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; font-weight: 600;">
+            <input type="checkbox" id="autoCalculateStandings" style="width: 20px; height: 20px; cursor: pointer;" />
+            <span>Auto-calculate standings from match scores</span>
+          </label>
+          <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 8px; margin-left: 32px;">When enabled, points, wins, draws, losses, GF, GA, and GD are calculated automatically from fixture scores. Disable to enter standings manually.</p>
+        </div>
+        <div class="standings-tabs">
+          <button class="standing-tab active" data-group="A">Group A</button>
+          <button class="standing-tab" data-group="B">Group B</button>
+          <button class="standing-tab" data-group="C">Group C</button>
+          <button class="standing-tab" data-group="D">Group D</button>
+        </div>
+        <div class="standings-list" id="standingsList"></div>
+      </section>
+
       <!-- SETTINGS SECTION -->
       <section class="content-section" id="settingsSection">
         <div class="section-header">
           <h2><i class="fas fa-cog"></i> Tournament Settings</h2>
         </div>
         <form class="settings-form" id="settingsForm">
-          <div class="form-group">
-            <label>Tournament Start Date</label>
-            <input type="date" id="startDate" required />
+          <div class="form-card">
+            <h3><i class="fas fa-calendar"></i> Tournament Dates</h3>
+            <div class="form-group">
+              <label>Tournament Start Date</label>
+              <input type="date" id="startDate" required />
+            </div>
+            <div class="form-group">
+              <label>Tournament End Date</label>
+              <input type="date" id="endDate" required />
+            </div>
+            <div class="form-group">
+              <label>Total Teams</label>
+              <input type="number" id="totalTeams" placeholder="16" required />
+            </div>
+            <div class="form-group">
+              <label>Total Matches</label>
+              <input type="number" id="totalMatches" placeholder="64" required />
+            </div>
           </div>
-          <div class="form-group">
-            <label>Tournament End Date</label>
-            <input type="date" id="endDate" required />
+
+          <div class="form-card">
+            <h3><i class="fas fa-trophy"></i> Prize Breakdown</h3>
+            <div class="form-group">
+              <label>Total Prize Pool ($)</label>
+              <input type="number" id="prizeMoney" placeholder="5000" required />
+            </div>
+            <div class="form-group">
+              <label>1st Place Winner Prize ($)</label>
+              <input type="number" id="prize1st" placeholder="2000" />
+            </div>
+            <div class="form-group">
+              <label>2nd Place Runner-up Prize ($)</label>
+              <input type="number" id="prize2nd" placeholder="1000" />
+            </div>
+            <div class="form-group">
+              <label>3rd Place Prize ($)</label>
+              <input type="number" id="prize3rd" placeholder="500" />
+            </div>
+            <div class="form-group">
+              <label>Golden Boot Prize ($)</label>
+              <input type="number" id="prizeGoldenBoot" placeholder="300" />
+            </div>
+            <div class="form-group">
+              <label>Golden Glove Prize ($)</label>
+              <input type="number" id="prizeGoldenGlove" placeholder="300" />
+            </div>
+            <div class="form-group">
+              <label>MVP Prize ($)</label>
+              <input type="number" id="prizeMVP" placeholder="500" />
+            </div>
           </div>
-          <div class="form-group">
-            <label>Prize Pool ($)</label>
-            <input type="number" id="prizeMoney" placeholder="5000" required />
-          </div>
-          <div class="form-group">
-            <label>Total Teams</label>
-            <input type="number" id="totalTeams" placeholder="16" required />
-          </div>
-          <div class="form-group">
-            <label>Total Matches</label>
-            <input type="number" id="totalMatches" placeholder="64" required />
-          </div>
+
           <button type="submit" class="btn-primary">
             <i class="fas fa-save"></i> Save Settings
           </button>
         </form>
+
+        <div class="form-card" style="margin-top: 40px;">
+          <h3><i class="fas fa-key"></i> Change Admin Password</h3>
+          <button type="button" class="btn-outline" id="changePasswordBtn">
+            <i class="fas fa-lock"></i> Change Password
+          </button>
+        </div>
       </section>
 
     </main>
@@ -310,34 +376,57 @@
 
   <!-- TEAM MODAL -->
   <div class="modal" id="teamModal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 650px;">
       <div class="modal-header">
         <h3 id="teamModalTitle">Add Team</h3>
         <button class="modal-close" onclick="closeModal('teamModal')">&times;</button>
       </div>
       <form id="teamForm">
         <input type="hidden" id="teamId" />
-        <div class="form-group">
-          <label>Team Name</label>
-          <input type="text" id="teamName" placeholder="e.g. Titans FC" required />
+        <div class="form-row">
+          <div class="form-group">
+            <label>Team Name</label>
+            <input type="text" id="teamName" placeholder="e.g. Titans FC" required />
+          </div>
+          <div class="form-group">
+            <label>Abbreviation (3 letters)</label>
+            <input type="text" id="teamAbbr" placeholder="e.g. TIT" maxlength="3" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Team Color</label>
+            <input type="color" id="teamColor" value="#e63946" required />
+          </div>
+          <div class="form-group">
+            <label>Group</label>
+            <select id="teamGroup" required>
+              <option value="A">Group A</option>
+              <option value="B">Group B</option>
+              <option value="C">Group C</option>
+              <option value="D">Group D</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
-          <label>Abbreviation (3 letters)</label>
-          <input type="text" id="teamAbbr" placeholder="e.g. TIT" maxlength="3" required />
+          <label>Team Captain Name</label>
+          <input type="text" id="teamCaptain" placeholder="e.g. Alex Morgan" />
         </div>
-        <div class="form-group">
-          <label>Team Color</label>
-          <input type="color" id="teamColor" value="#e63946" required />
+
+        <!-- Squad Roster -->
+        <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <label style="margin: 0; font-size: 1rem; color: var(--gold); font-weight: 700;"><i class="fas fa-users-gear"></i> Player Roster (18-23 Players)</label>
+            <button type="button" class="btn-outline-small" id="addRosterPlayerBtn">
+              <i class="fas fa-plus"></i> Add Player
+            </button>
+          </div>
+          <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 12px;">Manage player squad, jersey numbers, and positions.</p>
+          <div id="rosterList" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;">
+            <!-- Player rows inserted dynamically -->
+          </div>
         </div>
-        <div class="form-group">
-          <label>Group</label>
-          <select id="teamGroup" required>
-            <option value="A">Group A</option>
-            <option value="B">Group B</option>
-            <option value="C">Group C</option>
-            <option value="D">Group D</option>
-          </select>
-        </div>
+
         <div class="modal-footer">
           <button type="button" class="btn-outline" onclick="closeModal('teamModal')">Cancel</button>
           <button type="submit" class="btn-primary">Save Team</button>
@@ -478,6 +567,89 @@
         <div class="modal-footer">
           <button type="button" class="btn-outline" onclick="closeModal('galleryModal')">Cancel</button>
           <button type="submit" class="btn-primary">Save Image</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- STANDINGS MODAL -->
+  <div class="modal" id="standingModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="standingModalTitle">Add Standing Entry</h3>
+        <button class="modal-close" onclick="closeModal('standingModal')">&times;</button>
+      </div>
+      <form id="standingForm">
+        <input type="hidden" id="standingId" />
+        <div class="form-group">
+          <label>Team</label>
+          <select id="standingTeam" required></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Played</label>
+            <input type="number" id="standingPlayed" min="0" value="0" required />
+          </div>
+          <div class="form-group">
+            <label>Won</label>
+            <input type="number" id="standingWon" min="0" value="0" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Drawn</label>
+            <input type="number" id="standingDrawn" min="0" value="0" required />
+          </div>
+          <div class="form-group">
+            <label>Lost</label>
+            <input type="number" id="standingLost" min="0" value="0" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Goals For (GF)</label>
+            <input type="number" id="standingGF" min="0" value="0" required />
+          </div>
+          <div class="form-group">
+            <label>Goals Against (GA)</label>
+            <input type="number" id="standingGA" min="0" value="0" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Points</label>
+          <input type="number" id="standingPoints" min="0" value="0" required />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-outline" onclick="closeModal('standingModal')">Cancel</button>
+          <button type="submit" class="btn-primary">Save Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PASSWORD CHANGE MODAL -->
+  <div class="modal" id="passwordModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Change Admin Password</h3>
+        <button class="modal-close" onclick="closeModal('passwordModal')">&times;</button>
+      </div>
+      <form id="passwordForm">
+        <div class="form-group">
+          <label>Current Password</label>
+          <input type="password" id="currentPassword" placeholder="Enter current password" required />
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="newPassword" placeholder="Enter new password" required minlength="6" />
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm new password" required minlength="6" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-outline" onclick="closeModal('passwordModal')">Cancel</button>
+          <button type="submit" class="btn-primary">Change Password</button>
         </div>
       </form>
     </div>
