@@ -64,6 +64,7 @@ let FIXTURES = [];
 let SCORERS = [];
 let SETTINGS = {};
 let CONTENT = {};
+let STANDINGS_DATA = null;
 
 try {
   TEAMS = JSON.parse(localStorage.getItem('gl_teams')) || DEFAULT_TEAMS;
@@ -71,12 +72,14 @@ try {
   SCORERS = JSON.parse(localStorage.getItem('gl_scorers')) || [];
   SETTINGS = JSON.parse(localStorage.getItem('gl_settings')) || DEFAULT_SETTINGS;
   CONTENT = JSON.parse(localStorage.getItem('gl_content')) || DEFAULT_CONTENT;
+  STANDINGS_DATA = JSON.parse(localStorage.getItem('gl_standings')) || null;
 } catch (e) {
   TEAMS = DEFAULT_TEAMS;
   FIXTURES = [];
   SCORERS = [];
   SETTINGS = DEFAULT_SETTINGS;
   CONTENT = DEFAULT_CONTENT;
+  STANDINGS_DATA = null;
 }
 
 const STANDINGS = {
@@ -192,7 +195,12 @@ function applyWebsiteContent() {
     if (CONTENT.formatDesc) aboutCards[0].querySelector('p').textContent = CONTENT.formatDesc;
     if (CONTENT.scheduleDesc) aboutCards[1].querySelector('p').textContent = CONTENT.scheduleDesc;
     if (CONTENT.venueDesc) aboutCards[2].querySelector('p').textContent = CONTENT.venueDesc;
-    if (CONTENT.prizesDesc) aboutCards[3].querySelector('p').textContent = CONTENT.prizesDesc;
+    // Build dynamic prizes description if prize breakdown exists
+    let dynamicPrizes = CONTENT.prizesDesc;
+    if (!CONTENT.prizesDesc && (SETTINGS.prize1st || SETTINGS.prize2nd || SETTINGS.prize3rd)) {
+      dynamicPrizes = `$${(SETTINGS.prizeMoney || 5000).toLocaleString()} Total Prize Pool: 1st: $${(SETTINGS.prize1st || 2000).toLocaleString()}, 2nd: $${(SETTINGS.prize2nd || 1000).toLocaleString()}, 3rd: $${(SETTINGS.prize3rd || 500).toLocaleString()}, Golden Boot: $${(SETTINGS.prizeGoldenBoot || 300).toLocaleString()}, Golden Glove: $${(SETTINGS.prizeGoldenGlove || 300).toLocaleString()}, MVP: $${(SETTINGS.prizeMVP || 500).toLocaleString()}.`;
+    }
+    if (dynamicPrizes) aboutCards[3].querySelector('p').textContent = dynamicPrizes;
     if (CONTENT.rulesDesc) aboutCards[4].querySelector('p').textContent = CONTENT.rulesDesc;
     if (CONTENT.eligibilityDesc) aboutCards[5].querySelector('p').textContent = CONTENT.eligibilityDesc;
   }
@@ -352,9 +360,118 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 renderFixtures();
 
 // ---------- Standings ----------
+function calculateStandingsFromFixtures() {
+  const standingsMap = {};
+
+  // Initialize all teams
+  TEAMS.forEach(t => {
+    standingsMap[t.name] = {
+      name: t.name,
+      group: t.group || 'A',
+      p: 0,
+      w: 0,
+      d: 0,
+      l: 0,
+      gf: 0,
+      ga: 0
+    };
+  });
+
+  // Calculate from finished fixtures
+  FIXTURES.filter(f => f.status === 'Finished' && f.homeScore !== null && f.awayScore !== null).forEach(f => {
+    const homeTeam = TEAMS.find(t => t.id === f.homeTeamId);
+    const awayTeam = TEAMS.find(t => t.id === f.awayTeamId);
+
+    if (homeTeam && awayTeam) {
+      const hStats = standingsMap[homeTeam.name];
+      const aStats = standingsMap[awayTeam.name];
+
+      if (hStats && aStats) {
+        hStats.p += 1;
+        aStats.p += 1;
+        hStats.gf += f.homeScore;
+        hStats.ga += f.awayScore;
+        aStats.gf += f.awayScore;
+        aStats.ga += f.homeScore;
+
+        if (f.homeScore > f.awayScore) {
+          hStats.w += 1;
+          aStats.l += 1;
+        } else if (f.homeScore < f.awayScore) {
+          aStats.w += 1;
+          hStats.l += 1;
+        } else {
+          hStats.d += 1;
+          aStats.d += 1;
+        }
+      }
+    }
+  });
+
+  // Convert to array grouped by group
+  const grouped = { A: [], B: [], C: [], D: [] };
+  Object.values(standingsMap).forEach(team => {
+    const group = team.group || 'A';
+    if (grouped[group]) grouped[group].push(team);
+  });
+
+  // Sort each group by pts DESC, GD DESC, GF DESC
+  Object.keys(grouped).forEach(group => {
+    grouped[group].sort((a, b) => {
+      const ptsA = a.w * 3 + a.d;
+      const ptsB = b.w * 3 + b.d;
+      const gdA = a.gf - a.ga;
+      const gdB = b.gf - b.ga;
+      return ptsB - ptsA || gdB - gdA || b.gf - a.gf;
+    });
+  });
+
+  return grouped;
+}
+
+function getStandingsData() {
+  // If auto-calculate is enabled, calculate from fixtures
+  if (SETTINGS.autoCalculateStandings) {
+    return calculateStandingsFromFixtures();
+  }
+  // If manual standings exist, use them
+  if (STANDINGS_DATA && Array.isArray(STANDINGS_DATA) && STANDINGS_DATA.length > 0) {
+    const grouped = { A: [], B: [], C: [], D: [] };
+    STANDINGS_DATA.forEach(entry => {
+      const group = entry.group || 'A';
+      if (grouped[group]) {
+        grouped[group].push({
+          name: entry.team,
+          p: entry.played || 0,
+          w: entry.won || 0,
+          d: entry.drawn || 0,
+          l: entry.lost || 0,
+          gf: entry.gf || 0,
+          ga: entry.ga || 0
+        });
+      }
+    });
+    // Sort each group by pts DESC, GD DESC, GF DESC
+    Object.keys(grouped).forEach(group => {
+      grouped[group].sort((a, b) => {
+        const ptsA = a.w * 3 + a.d;
+        const ptsB = b.w * 3 + b.d;
+        const gdA = a.gf - a.ga;
+        const gdB = b.gf - b.ga;
+        return ptsB - ptsA || gdB - gdA || b.gf - a.gf;
+      });
+    });
+    return grouped;
+  }
+  // Otherwise use default standings
+  return STANDINGS;
+}
+
+const ACTIVE_STANDINGS = getStandingsData();
+
 function renderStandings(group) {
   const tbody = document.getElementById('standingsBody');
-  const data = STANDINGS[group];
+  const data = ACTIVE_STANDINGS[group] || [];
   tbody.innerHTML = data.map((t, i) => {
     const gd = t.gf - t.ga;
     const pts = t.w * 3 + t.d;

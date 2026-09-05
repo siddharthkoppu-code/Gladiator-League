@@ -296,6 +296,7 @@ function showAdminPanel() {
   renderTeams();
   renderFixtures();
   renderScorers();
+  renderStandings();
   renderRegistrations();
   renderGallery();
   loadSettingsForm();
@@ -352,10 +353,13 @@ function openTeamModal(teamId = null) {
     document.getElementById('teamAbbr').value = team.abbr;
     document.getElementById('teamColor').value = team.color;
     document.getElementById('teamGroup').value = team.group;
+    document.getElementById('teamCaptain').value = team.captain || '';
+    renderRosterInputs(team.roster || []);
   } else {
     title.textContent = 'Add Team';
     form.reset();
     document.getElementById('teamId').value = '';
+    renderRosterInputs();
   }
 
   modal.classList.add('active');
@@ -369,7 +373,9 @@ function handleTeamSubmit(e) {
     name: document.getElementById('teamName').value,
     abbr: document.getElementById('teamAbbr').value.toUpperCase(),
     color: document.getElementById('teamColor').value,
-    group: document.getElementById('teamGroup').value
+    group: document.getElementById('teamGroup').value,
+    captain: document.getElementById('teamCaptain').value,
+    roster: getRosterFromInputs()
   };
 
   if (id) {
@@ -610,21 +616,34 @@ function deleteScorer(id) {
 
 // ==================== SETTINGS ====================
 function loadSettingsForm() {
-  document.getElementById('startDate').value = settings.startDate;
-  document.getElementById('endDate').value = settings.endDate;
-  document.getElementById('prizeMoney').value = settings.prizeMoney;
-  document.getElementById('totalTeams').value = settings.totalTeams;
-  document.getElementById('totalMatches').value = settings.totalMatches;
+  document.getElementById('startDate').value = settings.startDate || DEFAULT_SETTINGS.startDate;
+  document.getElementById('endDate').value = settings.endDate || DEFAULT_SETTINGS.endDate;
+  document.getElementById('prizeMoney').value = settings.prizeMoney || DEFAULT_SETTINGS.prizeMoney;
+  document.getElementById('totalTeams').value = settings.totalTeams || DEFAULT_SETTINGS.totalTeams;
+  document.getElementById('totalMatches').value = settings.totalMatches || DEFAULT_SETTINGS.totalMatches;
+  document.getElementById('prize1st').value = settings.prize1st !== undefined ? settings.prize1st : DEFAULT_SETTINGS.prize1st;
+  document.getElementById('prize2nd').value = settings.prize2nd !== undefined ? settings.prize2nd : DEFAULT_SETTINGS.prize2nd;
+  document.getElementById('prize3rd').value = settings.prize3rd !== undefined ? settings.prize3rd : DEFAULT_SETTINGS.prize3rd;
+  document.getElementById('prizeGoldenBoot').value = settings.prizeGoldenBoot !== undefined ? settings.prizeGoldenBoot : DEFAULT_SETTINGS.prizeGoldenBoot;
+  document.getElementById('prizeGoldenGlove').value = settings.prizeGoldenGlove !== undefined ? settings.prizeGoldenGlove : DEFAULT_SETTINGS.prizeGoldenGlove;
+  document.getElementById('prizeMVP').value = settings.prizeMVP !== undefined ? settings.prizeMVP : DEFAULT_SETTINGS.prizeMVP;
 }
 
 function handleSettingsSubmit(e) {
   e.preventDefault();
   settings = {
+    ...settings,
     startDate: document.getElementById('startDate').value,
     endDate: document.getElementById('endDate').value,
-    prizeMoney: parseInt(document.getElementById('prizeMoney').value),
-    totalTeams: parseInt(document.getElementById('totalTeams').value),
-    totalMatches: parseInt(document.getElementById('totalMatches').value)
+    prizeMoney: parseInt(document.getElementById('prizeMoney').value) || 0,
+    totalTeams: parseInt(document.getElementById('totalTeams').value) || 0,
+    totalMatches: parseInt(document.getElementById('totalMatches').value) || 0,
+    prize1st: parseInt(document.getElementById('prize1st').value) || 0,
+    prize2nd: parseInt(document.getElementById('prize2nd').value) || 0,
+    prize3rd: parseInt(document.getElementById('prize3rd').value) || 0,
+    prizeGoldenBoot: parseInt(document.getElementById('prizeGoldenBoot').value) || 0,
+    prizeGoldenGlove: parseInt(document.getElementById('prizeGoldenGlove').value) || 0,
+    prizeMVP: parseInt(document.getElementById('prizeMVP').value) || 0
   };
   saveData();
   alert('Settings saved successfully!');
