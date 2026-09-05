@@ -21,6 +21,11 @@ function getAdminPassword() {
   return localStorage.getItem(STORAGE_KEYS.PASSWORD) || 'gladiator2026';
 }
 
+// Set admin password
+function setAdminPassword(newPassword) {
+  localStorage.setItem(STORAGE_KEYS.PASSWORD, newPassword);
+}
+
 // Default data
 const DEFAULT_TEAMS = [
   { id: 1, name: 'Titans FC', abbr: 'TIT', color: '#e63946', group: 'A' },
@@ -158,22 +163,28 @@ function saveData() {
 // ==================== AUTHENTICATION ====================
 function setupEventListeners() {
   // Login
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const password = document.getElementById('password').value;
-    if (password === getAdminPassword()) {
-      localStorage.setItem(STORAGE_KEYS.AUTH, 'true');
-      showAdminPanel();
-    } else {
-      alert('Incorrect password!');
-    }
-  });
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const password = document.getElementById('password').value;
+      if (password === getAdminPassword()) {
+        localStorage.setItem(STORAGE_KEYS.AUTH, 'true');
+        showAdminPanel();
+      } else {
+        alert('Incorrect password!');
+      }
+    });
+  }
 
   // Logout
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.removeItem(STORAGE_KEYS.AUTH);
-    location.reload();
-  });
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEYS.AUTH);
+      location.reload();
+    });
+  }
 
   // Navigation
   document.querySelectorAll('.nav-item').forEach(item => {
@@ -185,30 +196,42 @@ function setupEventListeners() {
   });
 
   // Teams
-  document.getElementById('addTeamBtn').addEventListener('click', () => openTeamModal());
-  document.getElementById('teamForm').addEventListener('submit', handleTeamSubmit);
+  const addTeamBtn = document.getElementById('addTeamBtn');
+  const teamForm = document.getElementById('teamForm');
+  if (addTeamBtn) addTeamBtn.addEventListener('click', () => openTeamModal());
+  if (teamForm) teamForm.addEventListener('submit', handleTeamSubmit);
 
   // Fixtures
-  document.getElementById('addFixtureBtn').addEventListener('click', () => openFixtureModal());
-  document.getElementById('fixtureForm').addEventListener('submit', handleFixtureSubmit);
+  const addFixtureBtn = document.getElementById('addFixtureBtn');
+  const fixtureForm = document.getElementById('fixtureForm');
+  if (addFixtureBtn) addFixtureBtn.addEventListener('click', () => openFixtureModal());
+  if (fixtureForm) fixtureForm.addEventListener('submit', handleFixtureSubmit);
 
   // Scorers
-  document.getElementById('addScorerBtn').addEventListener('click', () => openScorerModal());
-  document.getElementById('scorerForm').addEventListener('submit', handleScorerSubmit);
+  const addScorerBtn = document.getElementById('addScorerBtn');
+  const scorerForm = document.getElementById('scorerForm');
+  if (addScorerBtn) addScorerBtn.addEventListener('click', () => openScorerModal());
+  if (scorerForm) scorerForm.addEventListener('submit', handleScorerSubmit);
 
   // Settings
-  document.getElementById('settingsForm').addEventListener('submit', handleSettingsSubmit);
+  const settingsForm = document.getElementById('settingsForm');
+  if (settingsForm) settingsForm.addEventListener('submit', handleSettingsSubmit);
 
   // Content
-  document.getElementById('contentForm').addEventListener('submit', handleContentSubmit);
+  const contentForm = document.getElementById('contentForm');
+  if (contentForm) contentForm.addEventListener('submit', handleContentSubmit);
 
   // Registrations
-  document.getElementById('exportRegistrationsBtn').addEventListener('click', exportRegistrationsCSV);
-  document.getElementById('clearRegistrationsBtn').addEventListener('click', clearAllRegistrations);
+  const exportBtn = document.getElementById('exportRegistrationsBtn');
+  const clearBtn = document.getElementById('clearRegistrationsBtn');
+  if (exportBtn) exportBtn.addEventListener('click', exportRegistrationsCSV);
+  if (clearBtn) clearBtn.addEventListener('click', clearAllRegistrations);
 
   // Gallery
-  document.getElementById('addGalleryBtn').addEventListener('click', () => openGalleryModal());
-  document.getElementById('galleryForm').addEventListener('submit', handleGallerySubmit);
+  const addGalleryBtn = document.getElementById('addGalleryBtn');
+  const galleryForm = document.getElementById('galleryForm');
+  if (addGalleryBtn) addGalleryBtn.addEventListener('click', () => openGalleryModal());
+  if (galleryForm) galleryForm.addEventListener('submit', handleGallerySubmit);
 
   // Standings
   const addStandingBtn = document.getElementById('addStandingBtn');
@@ -711,7 +734,6 @@ function handleContentSubmit(e) {
   alert('Website content saved successfully! Refresh the main website to see changes.');
 }
 
-<<<<<<< HEAD
 // ==================== REGISTRATIONS ====================
 function renderRegistrations() {
   const container = document.getElementById('registrationsList');
